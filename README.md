@@ -1,27 +1,166 @@
-# reader 3
+# AI-Native Reader
 
-![reader3](reader3.png)
+**Swipe through books like Shorts — an AI-native reader that turns every page into a conversation.**
 
-A lightweight, self-hosted EPUB reader that lets you read through EPUB books one chapter at a time. This makes it very easy to copy paste the contents of a chapter to an LLM, to read along. Basically - get epub books (e.g. [Project Gutenberg](https://www.gutenberg.org/) has many), open them up in this reader, copy paste text around to your favorite LLM, and read together and along.
+AI-Native Reader is a lightweight, extensible ebook and document reader enhanced with local LLM intelligence. It transforms traditional reading into an interactive, insight-driven experience — powered entirely by models running on your own machine.
 
-This project was 90% vibe coded just to illustrate how one can very easily [read books together with LLMs](https://x.com/karpathy/status/1990577951671509438). I'm not going to support it in any way, it's provided here as is for other people's inspiration and I don't intend to improve it. Code is ephemeral now and libraries are over, ask your LLM to change it in whatever way you like.
+This project is based on the original *reader3* by Andrej Karpathy, and extends it with AI-assisted reading, local model integration, PDF/OCR support, and an interactive analysis workflow.
 
-## Usage
+---
 
-The project uses [uv](https://docs.astral.sh/uv/). So for example, download [Dracula EPUB3](https://www.gutenberg.org/ebooks/345) to this directory as `dracula.epub`, then:
+## 🚀 Features (MVP)
 
-```bash
-uv run reader3.py dracula.epub
+### **🔍 AI-Assisted Reading**
+
+* Select any text or analyze the entire chapter with a single click.
+* Plug-and-play prompt files for summaries, explanations, translations, and more.
+* Local LLM support (Llama, Qwen, DeepSeek, OpenAI-compatible models).
+
+### **📖 Multi-Format Support**
+
+* Full EPUB3 reading and navigation.
+* **PDF support via OCR** (DeepSeek OCR pipeline included in MVP).
+* Each document is normalized into a structured, book-like format for consistent reading.
+
+### **🧠 Local LLM Backend**
+
+* Modular backend design (`LLMClient`) supporting:
+
+  * Ollama
+  * OpenAI-compatible HTTP endpoints
+  * Custom model servers
+* Easily switch models via environment variables or configuration.
+
+### **⚡ Instant Analysis UI**
+
+* Clean, minimal UI on top of the original reader.
+* "Ask LLM" panel with prompt selector.
+* Automatically falls back to chapter-wide analysis when no text is selected.
+
+---
+
+## 🛠️ Architecture Overview
+
+The system consists of three core components:
+
+### **1. Document Processor**
+
+* EPUB: extracted into a `_data/` folder with HTML chapters and metadata.
+* PDF: processed through DeepSeek OCR → normalized into chapter-like HTML pages.
+
+### **2. Web Server**
+
+* Lightweight FastAPI-based backend.
+* Serves chapters, static assets, and LLM inference API.
+* Renders templates for reading and interaction.
+
+### **3. LLM Engine**
+
+* Unified client with swappable backends.
+* Prompt templating system in `prompts/`.
+* Customizable workflows (summary, QA, reasoning).
+
+---
+
+## 🧩 Prompt System
+
+Prompts are simple text or Markdown files placed in `prompts/`, e.g.:
+
+```text
+#name: Short Summary
+Please summarize the following text in a concise way:
+{text}
 ```
 
-This creates the directory `dracula_data`, which registers the book to your local library. We can then run the server:
+These appear automatically in the prompt dropdown inside the reader.
+
+---
+
+## 📦 Installation (MVP)
+
+### **1. Clone the Repository**
+
+```bash
+git clone https://github.com/yourname/ai-native-reader.git
+cd ai-native-reader
+```
+
+### **2. Install Dependencies**
+
+Using **uv**:
+
+```bash
+uv sync
+```
+
+### **3. Start the Server**
 
 ```bash
 uv run server.py
 ```
 
-And visit [localhost:8123](http://localhost:8123/) to see your current Library. You can easily add more books, or delete them from your library by deleting the folder. It's not supposed to be complicated or complex.
+Then open:
 
-## License
+```
+http://127.0.0.1:8123
+```
 
-MIT
+### **4. Process a Book**
+
+EPUB:
+
+```bash
+uv run reader3.py mybook.epub
+```
+
+PDF:
+
+```bash
+uv run pdf_reader3.py mybook.pdf
+```
+
+---
+
+## 🔧 Configuration
+
+Set your preferred local model and backend:
+
+```bash
+export LLM_BACKEND=ollama
+export LLM_MODEL=llama3
+export LLM_BASE_URL=http://localhost:11434
+```
+
+For DeepSeek or OpenAI-compatible servers:
+
+```bash
+export LLM_BACKEND=openai_compatible
+export LLM_MODEL=deepseek-chat
+export LLM_BASE_URL=http://localhost:8000
+```
+
+---
+
+## 📚 Roadmap
+
+* Better PDF segmentation & TOC reconstruction
+* Inline floating action button when selecting text
+* Vector-based semantic search
+* Book-level memory & long-context understanding
+* Optional cloud-model mode
+* Multi-user web version
+
+---
+
+## 📝 License
+
+MIT License — includes original portions from *reader3* by Andrej Karpathy.
+
+---
+
+## 🙌 Acknowledgements
+
+* **Andrej Karpathy** for the original [reader3](https://github.com/karpathy/reader3) project that inspired this work.
+* DeepSeek for OCR models.
+* The open-source LLM ecosystem for model and tooling support.
+
